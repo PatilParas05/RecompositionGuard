@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "RecompositionGuard"
 include(":app")
+include(":recompositionguard")
