@@ -51,7 +51,7 @@ fun RecompositionOverlay(){
             fontSize = 13.sp,
             modifier = Modifier.padding(bottom = 6.dp)
         )
-        if (entries.isNotEmpty()) {
+        if (entries.isEmpty()) {
             Text(
                 text = "Nothing tracked yet",
                 color = Color(0xFF888888),
