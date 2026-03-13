@@ -39,4 +39,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("androidx.compose.runtime:runtime:1.6.4")
+    implementation("androidx.compose.ui:ui:1.6.4")
+    implementation("androidx.compose.foundation:foundation:1.6.4")
+    implementation("androidx.compose.material3:material3:1.2.1")
 }
