@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.paraspatil.recompositionguard"
+    namespace = "dev.paraspatil.recompositionguard.lib"
     compileSdk = 36
 
     buildFeatures {
