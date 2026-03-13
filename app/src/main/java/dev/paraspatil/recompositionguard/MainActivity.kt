@@ -18,30 +18,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RecompositionGuardTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+            RecompositionGuard.install(
+                ThresholdConfig(
+                    warnThreshold = 3,
+                    errorThreshold = 6,
+                    overlayEnabled = true,
+                    logsEnabled = true,
+                    dashboardEnabled = true
+                )
+            )
+            setContent { TestScreen() }
+
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    RecompositionGuardTheme {
-        Greeting("Android")
     }
 }
