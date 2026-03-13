@@ -14,9 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -30,15 +27,14 @@ import kotlinx.coroutines.delay
 fun RecompositionOverlay(){
     if (!RecompositionGuard.isInstalled())return
     if (!RecompositionGuard.config.overlayEnabled) return
+    val trigger by RecompositionTracker.updateTrigger
 
-    var refresh by remember { mutableIntStateOf(0) }
     LaunchedEffect(Unit){
         while (true){
             delay(300)
-            refresh++
         }
     }
-    val entries = RecompositionTracker.data.values.sortedByDescending { it.count }
+    val entries = RecompositionTracker.data.values
         .sortedByDescending { it.count }
 
     Column(
