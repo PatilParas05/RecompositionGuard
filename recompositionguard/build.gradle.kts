@@ -9,6 +9,9 @@ android {
             minorApiLevel = 1
         }
     }
+    buildFeatures {
+        compose = true
+    }
 
     defaultConfig {
         minSdk = 26

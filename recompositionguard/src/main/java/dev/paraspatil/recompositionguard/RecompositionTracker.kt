@@ -1,6 +1,7 @@
 package dev.paraspatil.recompositionguard
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import dev.paraspatil.recompositionguard.logger.RecompositionLogger
 
 object RecompositionTracker{
     private val _data = mutableMapOf<String, RecompositionData>()
