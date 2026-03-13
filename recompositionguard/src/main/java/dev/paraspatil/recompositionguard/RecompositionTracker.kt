@@ -2,7 +2,6 @@ package dev.paraspatil.recompositionguard
 
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.staticCompositionLocalOf
 import dev.paraspatil.recompositionguard.logger.RecompositionLogger
 
@@ -15,13 +14,19 @@ object RecompositionTracker{
         private set
 
     fun track(name: String){
-        val entry = _data.getOrPut(name){ RecompositionData(name) }
-        entry.increment()
-        _data[name] = entry
+        val existing = _data[name]
+        _data[name]= if (existing != null){
+            existing.copy(
+                count = existing.count+1,
+                lastSeenAt = System.currentTimeMillis()
+            )
+        }else{
+            RecompositionData(name)
+        }
         updateTrigger.value++
 
         if(config.logsEnabled){
-            RecompositionLogger.log(name,entry.count,config)
+            RecompositionLogger.log(name,_data[name]!!.count,config)
         }
     }
     fun reset() {
