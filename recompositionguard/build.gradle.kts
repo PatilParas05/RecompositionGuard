@@ -1,14 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "dev.paraspatil.recompositionguard"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
+
     buildFeatures {
         compose = true
     }
@@ -42,6 +40,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(platform(libs.androidx.compose.bom))
     implementation("androidx.compose.runtime:runtime:1.6.4")
     implementation("androidx.compose.ui:ui:1.6.4")
     implementation("androidx.compose.foundation:foundation:1.6.4")
