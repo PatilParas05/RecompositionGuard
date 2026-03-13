@@ -27,8 +27,11 @@ class MainActivity : ComponentActivity() {
                     dashboardEnabled = true
                 )
             )
-            setContent { TestScreen() }
-
+            setContent {
+                RecompositionGuardTheme {
+                    TestScreen()
+                }
+            }
         }
     }
 }

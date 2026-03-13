@@ -10,7 +10,7 @@ fun GuardedComposable(
     content: @Composable () -> Unit
 ) {
     Box(modifier = modifier.trackRecomposition(name)) {
-        TrackRecomposition(name= name)
+        TrackRecomposition(name)
         content()
     }
 }

@@ -19,6 +19,7 @@ import dev.paraspatil.recompositionguard.compose.RecompositionDashboard
 fun TestScreen(){
     var tricks by remember { mutableStateOf(0) }
     var tricks2 by remember { mutableStateOf(0) }
+    val stableText = remember { "I will not recompose" }
 
     LaunchedEffect(Unit) {
     while (true){
@@ -35,7 +36,7 @@ fun TestScreen(){
                 Text("I will recompose a lot :$tricks")
             }
             GuardedComposable(name = "ColdComposable") {
-                Text("I will not recompose :$tricks2")
+                Text(stableText)
             }
         }
         RecompositionDashboard()

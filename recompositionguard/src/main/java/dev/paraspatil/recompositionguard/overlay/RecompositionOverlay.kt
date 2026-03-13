@@ -12,6 +12,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -19,13 +24,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.paraspatil.recompositionguard.RecompositionGuard
 import dev.paraspatil.recompositionguard.RecompositionTracker
+import kotlinx.coroutines.delay
 
 @Composable
 fun RecompositionOverlay(){
     if (!RecompositionGuard.isInstalled())return
     if (!RecompositionGuard.config.overlayEnabled) return
 
-    val entries = RecompositionTracker.data.values
+    var refresh by remember { mutableIntStateOf(0) }
+    LaunchedEffect(Unit){
+        while (true){
+            delay(300)
+            refresh++
+        }
+    }
+    val entries = RecompositionTracker.data.values.sortedByDescending { it.count }
         .sortedByDescending { it.count }
 
     Column(
