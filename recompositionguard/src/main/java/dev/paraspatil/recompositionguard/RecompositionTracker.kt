@@ -1,38 +1,48 @@
 package dev.paraspatil.recompositionguard
 
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.staticCompositionLocalOf
 import dev.paraspatil.recompositionguard.logger.RecompositionLogger
 
-object RecompositionTracker{
+object RecompositionTracker {
+
+    private val rawCounts = HashMap<String, Int>()
+    private val firstSeen = HashMap<String, Long>()
     val data: SnapshotStateMap<String, RecompositionData> = mutableStateMapOf()
+
     internal lateinit var config: ThresholdConfig
 
-    var updateTrigger = mutableStateOf(0)
-        private set
+    fun track(name: String) {
+        val newCount = (rawCounts[name] ?: 0) + 1
+        rawCounts[name] = newCount
+        if (!firstSeen.containsKey(name)) firstSeen[name] = System.currentTimeMillis()
 
-    fun track(name: String){
-        val existing = data[name]
-        data[name]= if (existing != null){
-            existing.copy(
-                count = existing.count+1,
-                lastSeenAt = System.currentTimeMillis()
-            )
-        }else{
-            RecompositionData(name)
-        }
-        updateTrigger.value++
-
-        if(config.logsEnabled){
-            RecompositionLogger.log(name,data[name]!!.count,config)
+        if (config.logsEnabled) {
+            RecompositionLogger.log(name, newCount, config)
         }
     }
+    fun flush() {
+        for ((name, count) in rawCounts) {
+            val existing = data[name]
+            if (existing == null || existing.count != count) {
+                data[name] = RecompositionData(
+                    name        = name,
+                    count       = count,
+                    firstSeenAt = firstSeen[name] ?: System.currentTimeMillis(),
+                    lastSeenAt  = System.currentTimeMillis()
+                )
+            }
+        }
+    }
+
     fun reset() {
+        rawCounts.clear()
+        firstSeen.clear()
         data.clear()
-        updateTrigger.value = 0
     }
-    fun getCount(name: String): Int= data[name]?.count?:0
+
+    fun getCount(name: String): Int = rawCounts[name] ?: 0
 }
-val LocalRecompositionTracker = staticCompositionLocalOf{RecompositionTracker}
+
+val LocalRecompositionTracker = staticCompositionLocalOf { RecompositionTracker }
