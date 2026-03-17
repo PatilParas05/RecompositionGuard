@@ -18,19 +18,21 @@ object RecompositionTracker {
         rawCounts[name] = newCount
         if (!firstSeen.containsKey(name)) firstSeen[name] = System.currentTimeMillis()
 
-        if (config.logsEnabled) {
+        if (::config.isInitialized && config.logsEnabled) {
             RecompositionLogger.log(name, newCount, config)
         }
     }
     fun flush() {
-        for ((name, count) in rawCounts) {
+        val currentRaw = HashMap(rawCounts)
+        android.util.Log.d("RecompositionGuard", "Flush called at ${System.currentTimeMillis()}")
+        currentRaw.forEach { (name, count) ->
             val existing = data[name]
             if (existing == null || existing.count != count) {
-                data[name] = RecompositionData(
-                    name        = name,
-                    count       = count,
+               data[name] = RecompositionData(
+                    name = name,
+                    count = count,
                     firstSeenAt = firstSeen[name] ?: System.currentTimeMillis(),
-                    lastSeenAt  = System.currentTimeMillis()
+                    lastSeenAt = System.currentTimeMillis()
                 )
             }
         }

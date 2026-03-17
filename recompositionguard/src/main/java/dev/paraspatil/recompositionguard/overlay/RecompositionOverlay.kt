@@ -13,6 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -21,13 +24,18 @@ import androidx.compose.ui.unit.sp
 import dev.paraspatil.recompositionguard.RecompositionGuard
 import dev.paraspatil.recompositionguard.RecompositionTracker
 
-@Composable
-fun RecompositionOverlay() {
-    if (!RecompositionGuard.isInstalled()) return
-    if (!RecompositionGuard.config.overlayEnabled) return
 
-    val entries = RecompositionTracker.data.values
-        .sortedByDescending { it.count }
+@Composable
+fun RecompositionOverlay(timestamp: Long) {
+    if (!RecompositionGuard.isInstalled() || !RecompositionGuard.config.overlayEnabled) return
+
+    val sortedEntries by remember(timestamp) {
+        derivedStateOf {
+            RecompositionTracker.data.values
+                .toList() // Snapshot current map state
+                .sortedByDescending { it.count }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -43,7 +51,7 @@ fun RecompositionOverlay() {
             modifier = Modifier.padding(bottom = 6.dp)
         )
 
-        if (entries.isEmpty()) {
+        if (sortedEntries.isEmpty()) {
             Text(
                 text = "Nothing tracked yet",
                 color = Color(0xFF888888),
@@ -51,7 +59,7 @@ fun RecompositionOverlay() {
             )
         } else {
             LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
-                items(entries.toList(), key = { it.name }) { entry ->
+                items(sortedEntries, key = { it.name }) { entry ->
                     val config = RecompositionGuard.config
                     val color = when {
                         entry.count >= config.errorThreshold -> Color(0xFFFF4444)

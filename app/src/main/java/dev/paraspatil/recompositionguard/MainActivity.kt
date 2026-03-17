@@ -10,10 +10,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         RecompositionGuard.install(
             ThresholdConfig(
-                warnThreshold = 3,
-                errorThreshold = 6,
+                warnThreshold = 3,      
+                errorThreshold = 8,     
                 overlayEnabled = true,
                 logsEnabled = true,
                 dashboardEnabled = true
@@ -22,7 +23,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             RecompositionGuardTheme {
-                TestScreen()
+                RapidTestScreen()
             }
         }
     }
