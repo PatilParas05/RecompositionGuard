@@ -3,19 +3,18 @@ package dev.paraspatil.recompositionguard
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.paraspatil.recompositionguard.compose.RecompositionDashboard
-import dev.paraspatil.recompositionguard.compose.TrackRecomposition
 import dev.paraspatil.recompositionguard.compose.trackRecomposition
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,13 +45,15 @@ fun RapidTestScreen(vm: RapidViewModel = viewModel()) {
             Text("⚡ RAPID TEST - Counter: $counter")
             Text("Watch the [Nx] counts increase rapidly!")
 
-            Divider()
+            HorizontalDivider()
 
             RapidHotComposable(count = counter)
             RapidColdComposable(trigger = counter)
             RapidUnstableComposable(unstableValue = counter.toString())
         }
-        RecompositionDashboard()
+        
+
+        RecompositionDashboard(alignment = Alignment.Center)
     }
 }
 
@@ -79,4 +80,3 @@ fun RapidUnstableComposable(unstableValue: String) {
         modifier = Modifier.trackRecomposition("RapidUnstableComposable")
     )
 }
-
