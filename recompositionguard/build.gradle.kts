@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
+    id("maven-publish")
 }
 
 android {
@@ -31,8 +32,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
-
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -45,4 +50,16 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.6.4")
     implementation("androidx.compose.foundation:foundation:1.6.4")
     implementation("androidx.compose.material3:material3:1.2.1")
+}
+afterEvaluate {
+    (extensions.getByName("publishing") as PublishingExtension).apply {
+        publications {
+            register<MavenPublication>("release") {
+                from(components["release"])
+                groupId    = "com.github.paraspatil"
+                artifactId = "recompositionguard"
+                version    = "1.0.0"
+            }
+        }
+    }
 }
