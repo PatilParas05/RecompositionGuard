@@ -13,5 +13,6 @@ object RecompositionGuard {
     fun isInstalled(): Boolean = _installed
     fun reset(){
         RecompositionTracker.reset()
+        dev.paraspatil.recompositionguard.logger.StabilityAdvisor.reset()
     }
 }

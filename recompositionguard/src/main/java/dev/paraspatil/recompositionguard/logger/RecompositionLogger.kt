@@ -7,18 +7,28 @@ object RecompositionLogger{
     private const val TAG ="RecompositionGuard"
 
     fun log(name: String, count: Int, config: ThresholdConfig) {
-    when{
-        count >= config.errorThreshold -> {
-            Log.e(TAG, buildMessage(name,count,"\uD83D\uDD34 EXCESSIVE"))
-            StabilityAdvisor.suggest(name,count)
+        val shouldLog = when {
+            count == 1 -> true
+            count == config.warnThreshold -> true
+            count == config.errorThreshold -> true
+            count > config.errorThreshold && count % 10 == 0 -> true
+            else -> false
         }
-        count >= config.warnThreshold -> {
-            Log.w(TAG, buildMessage(name,count,"\uD83D\uDFE1 MODERATE"))
+
+        if (!shouldLog) return
+
+        when {
+            count >= config.errorThreshold -> {
+                Log.e(TAG, buildMessage(name, count, "🔴 EXCESSIVE"))
+                StabilityAdvisor.suggest(name, count)
+            }
+            count >= config.warnThreshold -> {
+                Log.w(TAG, buildMessage(name, count, "🟡 MODERATE"))
+            }
+            else -> {
+                Log.d(TAG, buildMessage(name, count, "🟢 OK"))
+            }
         }
-        else ->{
-            Log.d(TAG, buildMessage(name,count,"\uD83D\uDFE2 OK"))
-        }
-    }
     }
     private fun buildMessage(name: String,count: Int,level: String): String{
         return "[$level] Composable: \"$name\" recomposed $count times(s)"
