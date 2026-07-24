@@ -29,7 +29,7 @@ import dev.paraspatil.recompositionguard.RecompositionTracker
 fun RecompositionOverlay(timestamp: Long) {
     if (!RecompositionGuard.isInstalled() || !RecompositionGuard.config.overlayEnabled) return
 
-    val sortedEntries by remember(timestamp) {
+    val sortedEntries by remember {
         derivedStateOf {
             RecompositionTracker.data.values
                 .toList() // Snapshot current map state

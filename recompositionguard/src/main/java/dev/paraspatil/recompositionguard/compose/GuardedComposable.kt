@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import dev.paraspatil.recompositionguard.LocalRecompositionTracker
 import dev.paraspatil.recompositionguard.RecompositionGuard
 import dev.paraspatil.recompositionguard.RecompositionTracker
 
@@ -17,9 +18,9 @@ fun GuardedComposable(
         Box(modifier = modifier) { content() }
         return
     }
-
+    val tracker = LocalRecompositionTracker.current
     SideEffect {
-        RecompositionTracker.track(name)
+        tracker.track(name)
     }
 
     Box(modifier = modifier) {

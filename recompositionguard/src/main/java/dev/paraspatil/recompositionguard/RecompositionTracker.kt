@@ -4,19 +4,20 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.staticCompositionLocalOf
 import dev.paraspatil.recompositionguard.logger.RecompositionLogger
+import java.util.concurrent.ConcurrentHashMap
 
 object RecompositionTracker {
 
-    private val rawCounts = HashMap<String, Int>()
-    private val firstSeen = HashMap<String, Long>()
+    private val rawCounts = ConcurrentHashMap<String, Int>()
+    private val firstSeen = ConcurrentHashMap<String, Long>()
     val data: SnapshotStateMap<String, RecompositionData> = mutableStateMapOf()
 
     internal lateinit var config: ThresholdConfig
 
     fun track(name: String) {
-        val newCount = (rawCounts[name] ?: 0) + 1
-        rawCounts[name] = newCount
-        if (!firstSeen.containsKey(name)) firstSeen[name] = System.currentTimeMillis()
+        val newCount = rawCounts.merge(name,1){old,value -> old+value}?:1
+
+        firstSeen.putIfAbsent(name, System.currentTimeMillis())
 
         if (::config.isInitialized && config.logsEnabled) {
             RecompositionLogger.log(name, newCount, config)
