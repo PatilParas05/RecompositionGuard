@@ -50,6 +50,11 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.6.4")
     implementation("androidx.compose.foundation:foundation:1.6.4")
     implementation("androidx.compose.material3:material3:1.2.1")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    // Compose UI testing
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.4")
 }
 afterEvaluate {
     (extensions.getByName("publishing") as PublishingExtension).apply {
