@@ -25,7 +25,11 @@ object RecompositionTracker {
     }
     fun flush() {
         val currentRaw = HashMap(rawCounts)
-        android.util.Log.d("RecompositionGuard", "Flush called at ${System.currentTimeMillis()}")
+        try {
+            android.util.Log.d("RecompositionGuard", "Flush called at ${System.currentTimeMillis()}")
+        } catch (e: Exception) {
+            // Ignore Log crashes in JVM unit tests
+        }
         currentRaw.forEach { (name, count) ->
             val existing = data[name]
             if (existing == null || existing.count != count) {
