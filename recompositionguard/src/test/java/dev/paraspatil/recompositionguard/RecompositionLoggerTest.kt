@@ -1,11 +1,17 @@
 package dev.paraspatil.recompositionguard
 
 import dev.paraspatil.recompositionguard.logger.RecompositionLogger
+import dev.paraspatil.recompositionguard.logger.SilentLogStrategy
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 
 class RecompositionLoggerTest {
     private  val config = ThresholdConfig(warnThreshold = 5, errorThreshold = 10)
+    @Before
+    fun setup(){
+        RecompositionGuard.logger = SilentLogStrategy()
+    }
     
     @Test
     fun `logger milestones work correctly`(){

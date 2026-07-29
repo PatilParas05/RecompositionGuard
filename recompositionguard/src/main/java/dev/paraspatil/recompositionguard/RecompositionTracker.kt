@@ -13,6 +13,7 @@ object RecompositionTracker {
     val data: SnapshotStateMap<String, RecompositionData> = mutableStateMapOf()
 
     internal lateinit var config: ThresholdConfig
+    val logger = RecompositionGuard.logger
 
     fun track(name: String) {
         val newCount = rawCounts.merge(name,1){old,value -> old+value}?:1
@@ -25,11 +26,9 @@ object RecompositionTracker {
     }
     fun flush() {
         val currentRaw = HashMap(rawCounts)
-        try {
-            android.util.Log.d("RecompositionGuard", "Flush called at ${System.currentTimeMillis()}")
-        } catch (e: Exception) {
-            // Ignore Log crashes in JVM unit tests
-        }
+
+            logger.d("RecompositionGuard", "Flush called at ${System.currentTimeMillis()}")
+
         currentRaw.forEach { (name, count) ->
             val existing = data[name]
             if (existing == null || existing.count != count) {

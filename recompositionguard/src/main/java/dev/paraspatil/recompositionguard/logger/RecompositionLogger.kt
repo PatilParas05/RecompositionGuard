@@ -1,10 +1,12 @@
 package dev.paraspatil.recompositionguard.logger
 
 import android.util.Log
+import dev.paraspatil.recompositionguard.RecompositionGuard
 import dev.paraspatil.recompositionguard.ThresholdConfig
 
 object RecompositionLogger{
     private const val TAG ="RecompositionGuard"
+    val logger = RecompositionGuard.logger
 
     fun log(name: String, count: Int, config: ThresholdConfig): Boolean {
         val shouldLog = when {
@@ -17,22 +19,18 @@ object RecompositionLogger{
 
         if (!shouldLog) return false
 
-        try {
             when {
                 count >= config.errorThreshold -> {
-                    Log.e(TAG, buildMessage(name, count, "🔴 EXCESSIVE"))
+                    logger.e(TAG, buildMessage(name, count, "🔴 EXCESSIVE"))
                     StabilityAdvisor.suggest(name, count)
                 }
                 count >= config.warnThreshold -> {
-                    Log.w(TAG, buildMessage(name, count, "🟡 MODERATE"))
+                    logger.w(TAG, buildMessage(name, count, "🟡 MODERATE"))
                 }
                 else -> {
-                    Log.d(TAG, buildMessage(name, count, "🟢 OK"))
+                    logger.d(TAG, buildMessage(name, count, "🟢 OK"))
                 }
             }
-        } catch (e: Exception) {
-            // Handle cases where android.util.Log is not mocked in Unit Tests
-        }
         return true
     }
     private fun buildMessage(name: String,count: Int,level: String): String{
