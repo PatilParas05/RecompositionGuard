@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     id("maven-publish")
+    id("signing")
 }
 
 android {
@@ -66,7 +67,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId    = "com.github.paraspatil"
                 artifactId = "recompositionguard"
-                version    = "1.0.1"
+                version    = "1.0.1 "
             }
         }
     }

@@ -15,7 +15,16 @@ object RecompositionTracker {
     internal lateinit var config: ThresholdConfig
     val logger = RecompositionGuard.logger
 
+    private var isPaused = false
+
+    fun togglePause() {
+        isPaused = !isPaused
+    }
+
+    fun isPaused(): Boolean = isPaused
+
     fun track(name: String) {
+        if (isPaused) return
         val newCount = rawCounts.merge(name,1){old,value -> old+value}?:1
 
         firstSeen.putIfAbsent(name, System.currentTimeMillis())

@@ -5,5 +5,6 @@ data class ThresholdConfig(
     val errorThreshold: Int=10,
     val overlayEnabled: Boolean=true,
     val logsEnabled: Boolean=true,
-    val dashboardEnabled: Boolean=true
+    val dashboardEnabled: Boolean=true,
+    val visualFlashEnabled: Boolean=true
 )
