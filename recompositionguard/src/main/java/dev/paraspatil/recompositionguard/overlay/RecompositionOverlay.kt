@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -34,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -58,11 +61,13 @@ fun RecompositionOverlay(timestamp: Long) {
     var isExpanded by remember { mutableStateOf(false) }
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
+    var searchQuery by remember { mutableStateOf("") }
 
-    val sortedEntries by remember {
+    val sortedEntries by remember(searchQuery) {
         derivedStateOf {
             RecompositionTracker.data.values
                 .toList() // Snapshot current map state
+                .filter {it.name.contains(searchQuery, ignoreCase = true) }//Filter data
                 .sortedByDescending { it.count }
         }
     }
@@ -162,6 +167,30 @@ fun RecompositionOverlay(timestamp: Long) {
                                 .clickable { isExpanded = false }
                         )
                     }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // SEARCH BAR
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0x33FFFFFF), RoundedCornerShape(4.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    if (searchQuery.isEmpty()) {
+                        Text("Search composable...", color = Color.Gray, fontSize = 10.sp)
+                    }
+                    BasicTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        singleLine = true,
+                        textStyle = TextStyle(
+                            color = Color.White,
+                            fontSize = 10.sp
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
