@@ -1,5 +1,6 @@
 package dev.paraspatil.recompositionguard.overlay
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -62,6 +63,7 @@ fun RecompositionOverlay(timestamp: Long) {
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
     var searchQuery by remember { mutableStateOf("") }
+    var selectedComponentName by remember { mutableStateOf<String?>(null) }
 
     val sortedEntries by remember(searchQuery) {
         derivedStateOf {
@@ -200,32 +202,52 @@ fun RecompositionOverlay(timestamp: Long) {
                     Text("Nothing tracked yet", color = Color.Gray, fontSize = 10.sp)
                 } else {
                     LazyColumn(
-                        modifier = Modifier.heightIn(max = 250.dp)
+                        modifier = Modifier.heightIn(max = 300.dp)
                     ) {
                         items(sortedEntries, key = { it.name }) { entry ->
+                            val isSelected = selectedComponentName == entry.name
                             val color = when {
                                 entry.count >= RecompositionGuard.config.errorThreshold -> Color(0xFFFF4444)
                                 entry.count >= RecompositionGuard.config.warnThreshold -> Color(0xFFFFAA00)
                                 else -> Color(0xFF44DD44)
                             }
-                            Row(
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 2.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                    .padding(vertical = 2.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(if (isSelected) Color(0x22FFFFFF) else Color.Transparent)
+                                    .clickable {
+                                        selectedComponentName = if (isSelected) null else entry.name
+                                    }
+                                    .padding(4.dp)
                             ) {
-                                Text(
-                                    entry.name,
-                                    color = Color.White,
-                                    fontSize = 10.sp,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                Text(
-                                    "[${entry.count}x]",
-                                    color = color,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 10.sp
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                ) {
+                                    Text(entry.name,color=Color.White, fontSize = 10.sp, modifier = Modifier.weight(1f))
+                                    Text(
+                                        "[${entry.count}x]",
+                                        color = color,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                                AnimatedVisibility(visible = isSelected) {
+                                    Column(modifier = Modifier.padding(top = 4.dp)) {
+                                        Text("💡 STABILITY TIPS:", color = Color.Yellow, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                        val tips = listOf(
+                                            "• Wrap lambdas with remember { }",
+                                            "• Use @Stable/@Immutable on data classes",
+                                            "• Move state reads out of composition",
+                                            "• Use derivedStateOf { } for calculations"
+                                        )
+                                        tips.forEach { tip ->
+                                            Text(tip, color = Color.LightGray, fontSize = 9.sp, modifier = Modifier.padding(vertical = 1.dp))
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

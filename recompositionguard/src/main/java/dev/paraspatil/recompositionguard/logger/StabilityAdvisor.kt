@@ -1,6 +1,4 @@
 package dev.paraspatil.recompositionguard.logger
-
-import android.util.Log
 import dev.paraspatil.recompositionguard.RecompositionGuard
 
 object StabilityAdvisor {

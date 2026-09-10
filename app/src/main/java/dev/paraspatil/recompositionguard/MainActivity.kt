@@ -13,8 +13,8 @@ class MainActivity : ComponentActivity() {
 
         RecompositionGuard.install(
             ThresholdConfig(
-                warnThreshold = 3,      
-                errorThreshold = 8,     
+                warnThreshold = 8,
+                errorThreshold = 15,
                 overlayEnabled = true,
                 logsEnabled = true,
                 dashboardEnabled = true
