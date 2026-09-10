@@ -13,7 +13,6 @@ object RecompositionTracker {
     val data: SnapshotStateMap<String, RecompositionData> = mutableStateMapOf()
 
     internal lateinit var config: ThresholdConfig
-    val logger = RecompositionGuard.logger
 
     private var isPaused = false
 
@@ -35,8 +34,6 @@ object RecompositionTracker {
     }
     fun flush() {
         val currentRaw = HashMap(rawCounts)
-
-            logger.d("RecompositionGuard", "Flush called at ${System.currentTimeMillis()}")
 
         currentRaw.forEach { (name, count) ->
             val existing = data[name]

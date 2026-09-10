@@ -22,7 +22,7 @@ import kotlinx.coroutines.delay
 fun RecompositionDashboard(
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.TopEnd,
-    flushIntervalMs: Long = 100L
+    flushIntervalMs: Long = 500L
 ){
     var lastFlushTime by remember { mutableLongStateOf(0L) }
     val tracker = LocalRecompositionTracker.current
