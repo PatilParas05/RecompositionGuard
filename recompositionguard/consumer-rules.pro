@@ -1,0 +1,2 @@
+-keep class dev.paraspatil.recompositionguard.** { *; }
+-dontwarn dev.paraspatil.recompositionguard.**

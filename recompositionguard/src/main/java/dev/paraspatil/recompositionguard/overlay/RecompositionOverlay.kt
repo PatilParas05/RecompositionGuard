@@ -1,5 +1,6 @@
 package dev.paraspatil.recompositionguard.overlay
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,6 +46,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -235,6 +239,21 @@ fun RecompositionOverlay(timestamp: Long) {
                                     )
                                 }
                                 AnimatedVisibility(visible = isSelected) {
+                                    val clipboardManager = LocalClipboardManager.current
+                                    val context = LocalContext.current
+                                    val report = RecompositionTracker.data.values.joinToString("\n") {
+                                            "${it.name}: [${it.count}x]"
+                                        }
+                                    clipboardManager.setText(
+                                        AnnotatedString(
+                                            report
+                                        )
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        "Report copied to clipboard! 📋",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     Column(modifier = Modifier.padding(top = 4.dp)) {
                                         Text("💡 STABILITY TIPS:", color = Color.Yellow, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                                         val tips = listOf(
