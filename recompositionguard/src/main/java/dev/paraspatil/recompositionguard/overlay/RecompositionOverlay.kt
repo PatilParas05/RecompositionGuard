@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -37,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,10 +58,12 @@ import dev.paraspatil.recompositionguard.RecompositionGuard
 import dev.paraspatil.recompositionguard.RecompositionTracker
 import kotlin.math.roundToInt
 
-
 @Composable
 fun RecompositionOverlay(timestamp: Long) {
     if (!RecompositionGuard.isInstalled() || !RecompositionGuard.config.overlayEnabled) return
+
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
 
     var isExpanded by remember { mutableStateOf(false) }
     var offsetX by remember { mutableStateOf(0f) }
@@ -72,8 +74,8 @@ fun RecompositionOverlay(timestamp: Long) {
     val sortedEntries by remember(searchQuery) {
         derivedStateOf {
             RecompositionTracker.data.values
-                .toList() // Snapshot current map state
-                .filter {it.name.contains(searchQuery, ignoreCase = true) }//Filter data
+                .toList()
+                .filter { it.name.contains(searchQuery, ignoreCase = true) }
                 .sortedByDescending { it.count }
         }
     }
@@ -94,7 +96,7 @@ fun RecompositionOverlay(timestamp: Long) {
                     offsetY += dragAmount.y
                 }
             }
-    ){
+    ) {
         if (!isExpanded) {
             // --- MINIMIZED BUBBLE ---
             BadgedBox(
@@ -120,7 +122,7 @@ fun RecompositionOverlay(timestamp: Long) {
             // --- EXPANDED DASHBOARD ---
             Column(
                 modifier = Modifier
-                    .widthIn(220.dp) // Use widthIn for better flexibility
+                    .widthIn(220.dp)
                     .wrapContentHeight()
                     .background(Color(0xEE1A1A1A), RoundedCornerShape(12.dp))
                     .padding(10.dp)
@@ -139,14 +141,44 @@ fun RecompositionOverlay(timestamp: Long) {
                     )
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Pause Toggle
+                        // Pause / Play Toggle
                         Icon(
-                            imageVector = if (RecompositionTracker.isPaused()) Icons.Default.PlayArrow else Icons.Default.Refresh,
-                            contentDescription = "Toggle Pause",
-                            tint = Color.White,
+                            imageVector = if (RecompositionTracker.isPaused) Icons.Default.PlayArrow else Icons.Default.Refresh,
+                            contentDescription = if (RecompositionTracker.isPaused) "Resume Tracking" else "Pause Tracking",
+                            tint = if (RecompositionTracker.isPaused) Color.Yellow else Color.White,
                             modifier = Modifier
                                 .size(18.dp)
                                 .clickable { RecompositionTracker.togglePause() }
+                        )
+
+                        Spacer(Modifier.width(8.dp))
+
+                        // Copy Report Button
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Copy Report",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(18.dp)
+                                .clickable {
+                                    val report = RecompositionTracker.data.values.joinToString("\n") {
+                                        "${it.name}: [${it.count}x]"
+                                    }
+                                    if (report.isNotEmpty()) {
+                                        clipboardManager.setText(AnnotatedString(report))
+                                        Toast.makeText(
+                                            context,
+                                            "Report copied to clipboard! 📋",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "No data to copy",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
                         )
 
                         Spacer(Modifier.width(8.dp))
@@ -230,7 +262,7 @@ fun RecompositionOverlay(timestamp: Long) {
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
-                                    Text(entry.name,color=Color.White, fontSize = 10.sp, modifier = Modifier.weight(1f))
+                                    Text(entry.name, color = Color.White, fontSize = 10.sp, modifier = Modifier.weight(1f))
                                     Text(
                                         "[${entry.count}x]",
                                         color = color,
@@ -239,21 +271,6 @@ fun RecompositionOverlay(timestamp: Long) {
                                     )
                                 }
                                 AnimatedVisibility(visible = isSelected) {
-                                    val clipboardManager = LocalClipboardManager.current
-                                    val context = LocalContext.current
-                                    val report = RecompositionTracker.data.values.joinToString("\n") {
-                                            "${it.name}: [${it.count}x]"
-                                        }
-                                    clipboardManager.setText(
-                                        AnnotatedString(
-                                            report
-                                        )
-                                    )
-                                    Toast.makeText(
-                                        context,
-                                        "Report copied to clipboard! 📋",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
                                     Column(modifier = Modifier.padding(top = 4.dp)) {
                                         Text("💡 STABILITY TIPS:", color = Color.Yellow, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                                         val tips = listOf(

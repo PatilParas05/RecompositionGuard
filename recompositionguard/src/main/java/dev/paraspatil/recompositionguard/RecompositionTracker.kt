@@ -1,6 +1,9 @@
 package dev.paraspatil.recompositionguard
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.staticCompositionLocalOf
 import dev.paraspatil.recompositionguard.logger.RecompositionLogger
@@ -14,17 +17,16 @@ object RecompositionTracker {
 
     internal lateinit var config: ThresholdConfig
 
-    private var isPaused = false
+    var isPaused by mutableStateOf(false)
+        private set
 
     fun togglePause() {
         isPaused = !isPaused
     }
 
-    fun isPaused(): Boolean = isPaused
-
     fun track(name: String) {
         if (isPaused) return
-        val newCount = rawCounts.merge(name,1){old,value -> old+value}?:1
+        val newCount = rawCounts.merge(name, 1) { old, value -> old + value } ?: 1
 
         firstSeen.putIfAbsent(name, System.currentTimeMillis())
 
@@ -32,13 +34,14 @@ object RecompositionTracker {
             RecompositionLogger.log(name, newCount, config)
         }
     }
+
     fun flush() {
         val currentRaw = HashMap(rawCounts)
 
         currentRaw.forEach { (name, count) ->
             val existing = data[name]
             if (existing == null || existing.count != count) {
-               data[name] = RecompositionData(
+                data[name] = RecompositionData(
                     name = name,
                     count = count,
                     firstSeenAt = firstSeen[name] ?: System.currentTimeMillis(),
